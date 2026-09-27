@@ -1,6 +1,8 @@
 name: Bootstrap Archify diagrams
 on:
   workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
   push:
     branches: [main]
     paths:
@@ -14,6 +16,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -28,4 +31,10 @@ jobs:
       - name: Build gallery and README
         run: printf '%s\n' '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Archify diagrams</title></head><body><h1>Archify diagrams</h1><ul><li><a href="./architecture.html">Architecture</a></li><li><a href="./content-workflow.html">Content Workflow</a></li><li><a href="./content-lifecycle.html">Content Lifecycle</a></li></ul></body></html>' > public/diagrams/archify/index.html && printf '%s\n' '# Archify diagrams' '' 'Generated with the exact Archify skill installed at .agents/skills/archify.' > docs/archify/README.md
       - name: Commit and remove bootstrap
-        run: git config user.name github-actions[bot] && git config user.email 41898282+github-actions[bot]@users.noreply.github.com && rm -f .github/workflows/archify-bootstrap.yml && git add -A && git commit -m "feat: install Archify and add project diagrams" && git push
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          rm -f .github/workflows/archify-bootstrap.yml .github/archify-run-trigger
+          git add -A
+          git commit -m "feat: install Archify and add project diagrams"
+          git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
