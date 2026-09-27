@@ -1,8 +1,6 @@
 name: Bootstrap Archify diagrams
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened]
   push:
     branches: [main]
     paths:
@@ -16,7 +14,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -37,4 +34,4 @@ jobs:
           rm -f .github/workflows/archify-bootstrap.yml .github/archify-run-trigger
           git add -A
           git commit -m "feat: install Archify and add project diagrams"
-          git push origin "HEAD:${{ github.head_ref || github.ref_name }}"
+          git push
